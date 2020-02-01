@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 #global vars
-
 #formatting
 RED='\033[0;31m' #red
 GRN='\033[0;32m' #green
@@ -10,16 +9,21 @@ normal=$(tput sgr0) #normal
 Purple='\033[1;35m' #purple
 Cyan='\033[1;36m' #cyan
 Yellow='\033[1;33m' #yellow
-
+currentVersion=1.2
 #splash-text arrays
+#add your own by adding to the below arrays
 arr[0]=$(echo -e "\U0001F50E Generating list...")
 arr[1]=$(echo -e "\U0001F50E Scraping data...")
 arr[2]=$(echo -e "\U0001F50E Spinning web...")
+#arr[n]=$(echo -e "\U0001F50E YOUR TEXT GOES HERE")
+#a full list of emoji unicode can be found here:
+#https://github.com/carpedm20/emoji/blob/master/emoji/unicode_codes.py
 
 #time-on-run
 timestamp=$(date +%Y-%m-%d-%H:%M)
 
 #data locations
+#stores the default location of the download path of the various feeds - these can be modified to custom locations
 PayloadReport=/home/$USER/Desktop/malScraper/PayloadReport.txt
 AMPReport=/home/$USER/Desktop/malScraper/AMPReport.txt
 C2Report=/home/$USER/Desktop/malScraper/C2Report.txt
@@ -28,7 +32,7 @@ HexReport=/home/$USER/Desktop/malScraper/HexReport.csv
 HausMalDown=/home/$USER/Desktop/malScraper/HausMalDown.csv
 PhishTank=/home/$USER/Desktop/malScraper/Phishing/PhishTank.csv
 
-#pull random token from array
+#pull random string from array
 rand=$[$RANDOM % ${#arr[@]}]
 
 #feed locations
@@ -42,8 +46,16 @@ PhishTank=$(base64 -d <<<"H4sIAHFCXV0AA8soKSmw0tdPSSxJ1CvIyCzOKEnMy9ZLzs8FC+nn5+
 oid3DTAAAAA=" | gunzip)
 HausMalDown=$(base64 -d <<<"H4sIAJqXXl0AA8soKSkottLXLy3KyUgsLdZLTCotTtVLztBPyS/Py8lPTCnWTy4u0+cCAON9198o
 AAAA" | gunzip)
+#This section is fully modular, feel free to add additional feeds. To encode the feed links, open a terminal
+#and echo the feed URL through the following command: echo <FEEDURL> | gzip | base64
+
+#GitHub CodeLoad API
+release=$(base64 -d <<<"H4sIAJjfGF4AAw3JMQ6AIAwF0N27SHfv4CIn+JKGkgBtaB28vb71SYT5QQRrqbaQ505FBy02dbpe
+zP3UiSqYNNBzWTBef3eGs1NHsMf2AXgtyE1GAAAA" | gunzip)
 
 #functions
+
+#this function stored the download path of each feed, and prints to screen when called
 dirList() {
 	printf "${GRN}${bold}Success - Files written to:\n${normal}${NC}"
 	printf "${GRN}${bold}1. ${normal}${RED}${bold}Payload Domains:${normal}${NC}"
@@ -60,10 +72,12 @@ dirList() {
 	printf "/home/$USER/Desktop/malScraper/${bold}Top100.txt${normal}\n\n"
 }
 
+#this function is responsible for performing a full scan - reports are scraped from all configured feeds
 fullScan() {
-	clear
-	echo $(date)
-	echo ${arr[$rand]}
+	clear #clear screen
+	echo $(date) #print current date & time
+	echo ${arr[$rand]} #print one if the spash text items from the array
+	#the below if statements verify if previous reports exist, and if found, delete them
 	if test -f "$PayloadReport"; then
 	rm /home/$USER/Desktop/malScraper/PayloadReport.txt
 	#echo "Updating existing payload report..."
@@ -103,8 +117,9 @@ fullScan() {
 	cd /home/$USER/Desktop/malScraper/Phishing
 	mv online-valid.csv PhishTank.csv
 	cd /home/$USER/Desktop/malScraper/
-	#strip domains of their http:// and www. headers for ez amp
+	#strip domains of their http:// and www. headers for easy blacklisting
 	cat PayloadReport.txt | egrep -o "http://([^/]*)/" | sed -e 's/^http:\/\///g' | sed 's/www\./ /g' | sed 's/\/$/ /g' | sed 's/ //g' >> AMPReport.txt
+	#only display the most recent 100 domains
 	head -100 /home/$USER/Desktop/malScraper/PayloadReport.txt > /home/$USER/Desktop/malScraper/Top100.txt
 	#sort temp1.txt | uniq > PayloadReport.txt
 	#sort temp2.txt | uniq > AMPReport.txt
@@ -124,6 +139,7 @@ fullScan() {
 
 		if [[ $option == "1" ]]
 		then
+			#xdg-open opens the specified file path
 			xdg-open /home/$USER/Desktop/malScraper/PayloadReport.txt
 			userOptions
 		
@@ -159,8 +175,8 @@ fullScan() {
 		
 		else
 			clear
-			printf "${RED}${bold}Error: ${normal}${NC}Invalid Option.\n"
 			dirList
+			printf "${RED}${bold}Error: ${normal}${NC}Invalid Option.\n"
 			read -p "Which feed would you like to open?" option
 		fi
 	done
@@ -210,11 +226,15 @@ quickScan() {
 
 exit() {
 	#close terminal
+	arr[0]=$(echo -e "Bye... \U0001F44B\U0001F622")
+	arr[1]=$(echo -e "Cya... \U0001F44B\U0001F622")
+	arr[2]=$(echo -e "Byeeeeeeeeeeee... \U0001F44B\U0001F622")
+	rand=$[$RANDOM % ${#arr[@]}]
 	read -p "Are you sure? (Y/N)" closeConf
 	closeConf=${closeConf^^} #force user input to uppercase
 	if [[ $closeConf == "Y" ]] || [[ $closeConf == "YES" ]]
 	then
-		echo -e "Bye... \U0001F44B\U0001F622"
+		echo ${arr[$rand]}
 		sleep .5
 		wmctrl -c :ACTIVE:
 	elif [[ $closeConf == "N" ]] || [[ $closeConf == "NO" ]]
@@ -222,11 +242,22 @@ exit() {
 			printf "\n"
 			userOptions
 	else
+		clear
 		printf "${RED}${bold}Error - ${normal}${NC}invalid operation\n"
+		clear
 		helpText
 		userOptions
 	fi
 }
+
+
+installUpdate() {
+	unzip /home/$USER/Desktop/malScraper/Updates/1.2 -d /home/$USER/Desktop/malScraper/Updates/
+}
+
+###############################################################
+#function responsible for loading unctions based on user input#
+###############################################################
 
 userOptions() {
 	read -p "malScraper>" option #store user input
@@ -255,28 +286,26 @@ userOptions() {
 	elif [[ $option == "TUTORIAL" ]]
 		then
 			tutorial
-	elif [[ $option == "OPEN" ]] || [[ $option == "OFEED" ]] || [[ $option == "-O" ]]
+	elif [[ $option == "REOPEN" ]] || [[ $option == "OPEN" ]]
 		then
-			openReport
-	elif [[ $option == "RECENT" ]] || [[ $option == "RHASH" ]] || [[ $option == "RH" ]]
+			reOpen
+	elif [[ $option == "INSTALL" ]] || [[ $option == "UPDATE" ]]
 		then
-			mostRecentHash
-	elif [[ $option == "VIRUSTOTAL" ]] || [[ $option == "VTREPORT" ]] || [[ $option == "VT" ]]
-		then
-			vtScan
+			installUpdate
 	else
-		printf "${RED}${bold}Error - ${normal}${NC}invalid operation\n"
+		clear
+		printf "${RED}${bold}Error - ${normal}${NC}invalid operation\n\n"
 		helpText
 		userOptions
 	fi
 }
 
-openReport() {
-	echo -e "Go away you egg, this menu is unfinished. \U0001F620"
-	sleep .5
-	printf "\n"
-	userOptions
-}
+##############################################################################################################
+#this function is responsible for ensuring the requirements have been installed on the host before continuing#
+#the function will run a test to determine if the following required tools are present on the machine:       #
+#figlet - used for presentation / formating - allows ascii art to be printed to the terminal                 #
+#wmctrl - used to manipulate the terminal window - allows the terminal to be maximized on script launch      #
+##############################################################################################################
 
 setupHost() {
 	#wmctrl -r :ACTIVE: -b add,maximized_vert,maximized_horz
@@ -284,7 +313,7 @@ setupHost() {
 	mkdir -p /home/$USER/Desktop/malScraper
 	mkdir -p /home/$USER/Desktop/malScraper/Phishing
 	#check if preRequisates are installed
-	figlet=/usr/bin/figlet
+	figlet=/usr/bin/figlet #figlet default install path
 	if test -f $figlet
 	then
 		#echo "Figlet is installed, continuing..."
@@ -296,7 +325,7 @@ setupHost() {
 		sudo apt-get install figlet
 		clear
 	fi
-	wmctrl=/usr/bin/wmctrl
+	wmctrl=/usr/bin/wmctrl #wmctrl default install path
 	if test -f $wmctrl
 	then
 		#echo "wmctrl is installed, continuing..."
@@ -326,10 +355,18 @@ setupHost() {
 	main
 }
 
+########################################################
+#function responsible for clearing users screen on call#
+########################################################
+
 clearScreen() {
 	clear
 	userOptions
 }
+
+###############################################################################
+#function responsible for storing the help text for usage in the help function#
+###############################################################################
 
 helpText() {
 	printf "${Cyan}HELP MENU${NC} ${bold}::${normal} Available ${Yellow}options${NC} shown below:\n\n"
@@ -338,71 +375,143 @@ helpText() {
 	printf "${bold}[*]${normal} ${Cyan}Show options${NC} for this tool\t\t\t\t\t\t${Yellow}SHOW OPTIONS,SHOW,OPTIONS${NC}\n"
 	printf "${bold}[*]${normal} ${Cyan}Clear${NC} screen\t\t\t\t\t\t\t${Yellow}CLEAR,CLEAR-HOST,CLS${NC}\n"
 	printf "${bold}[*]${normal} Return to ${Cyan}Home${NC} Menu\t\t\t\t\t\t\t${Yellow}HOME,BACK,CD ..${NC}\n"
+	printf "${bold}[*]${normal} ${Cyan}Open${NC} an existing report\t\t\t\t\t\t${Yellow}OPEN,REOPEN${NC}\n"
 	printf "${bold}[*]${normal} ${Cyan}Quit${NC} malScraper\t\t\t\t\t\t\t${Yellow}QUIT,EXIT${NC}\n"
+	printf "${bold}[*]${normal} ${Cyan}Install${NC} the latest ${Cyan}update${NC}\t\t\t\t\t\t${Yellow}INSTALL,UPDATE${NC}\n"
 	printf "${bold}[*]${normal} Perform ${Cyan}Full-Scan${NC} (Note this may take some time)\t\t\t${Yellow}FULL,FULL-SCAN,FSCAN${NC}\n"
-	printf "${bold}[*]${normal} Perform ${Cyan}Quick-Scan${NC} Most recent 100 Payload Domains\t\t\t${Yellow}QUICK,QUICK-SCAN,QSCAN${NC}\n"
-	printf "${bold}[*]${normal} ${Cyan}Open existing${NC} previously generated report file\t\t\t${Yellow}OPEN,OFEED,-O${NC}\n"
-	printf "${bold}[*]${normal} Print ${Cyan}MD5 Hash${NC} of most recently downloaded file\t\t\t${Yellow}RECENT,RHASH,RH${NC}\n"
-	printf "${bold}[*]${normal} Generate a ${Cyan}VirusTotal${NC} report of most recently downloaded file\t${Yellow}VirusTotal,VTReport,VT${NC}\n\n"
+	printf "${bold}[*]${normal} Perform ${Cyan}Quick-Scan${NC} (Most recent 100 Payload Domains)\t\t${Yellow}QUICK,QUICK-SCAN,QSCAN${NC}\n\n"
 }
+
+###########################################################
+#function responsible for printing the help menu to screen#
+###########################################################
 
 help() {
 	helpText
 	userOptions
 }
 
-mostRecentHash() {
+#####################################################################
+#function responsible for printing the usage tutorial menu to screen#
+#####################################################################
+
+tutorial() {
+	#echo -e "Go away you egg, this menu is unfinished. \U0001F620"
+	tutText="\n${bold}MalScraper\n\n${bold}NAME\n - ${normal}./malScraper.sh - malScraper scrapes a list of Payload Domains, IOC's & C2 IPs from from various feeds, for easy blacklisting.\n\n${bold}SYNOPSIS\n./extract ${normal}\e[4m[FILE]\e[0m\n${bold}e.g. - ${normal}./malScraper \n\n${bold}DESCRIPTION\n - ${normal}This menu us incomplete :('\n"
 	clear
-	cd /home/$USER/Downloads/
-	mostRecent="$(ls -t | head -n1)"
-	printf "${GRN}${bold}Most Recent Hash / Filename:\n${NC}"
-	md5sum "$mostRecent"
-	VTHash=$(md5sum $(ls -t | head -n1) | awk '{print $1}')#
-	printf "\n"
+	printf "$tutText"
+	#sleep .5
+	#printf "\n"
 	userOptions
 }
 
-vtScan() {
-	VTAPIToken=63c74add1fbcb18cd03e860185b2716cc6f756071f698674d7ab125d5e38840d
-	cd /home/$USER/Downloads/
-	
-	if [ "$VTAPIToken" == "" ] || [ "$VTAPIToken" == " " ]; then
-		printf "${RED}ERROR:${NC} No API key detected. Fetch your API key from: https://www.virustotal.com/gui/user/<YOURUSERNAME>/apikey\n" #print the help menu to the screen
-		exit 1 #force exit script
-	fi
-	
-	printf "${bold}${GRN}--------------------------------\n${NC}${normal}"
-	printf "${GRN}${bold}Downloads Folder Hash/Filename\n${normal}${NC}"
-	printf "${bold}${GRN}--------------------------------\n${NC}${normal}"
-	
-	for file in *; do
-		md5sum "$file"
-	done | sed 's/  /+,/' | awk -F"+" '{print $1, $2, $3}' | sed 's/ ,/,/g'
-	
-	printf "${bold}${GRN}--------------------------------\n${NC}${normal}"
-	printf "${GRN}${bold}Most Recent File:\n${NC}"
-	md5sum "$mostRecent"
-	printf "${bold}${GRN}--------------------------------\n${NC}${normal}"
-	VTHash=$(md5sum $(ls -t | head -n1) | awk '{print $1}')
-	printf "${GRN}${bold}VirusTotal Summary:\n${normal}${NC}"
-	curl -A "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0" -s -X POST 'https://www.virustotal.com/vtapi/v2/file/report' --form apikey=$VTAPIToken --form resource=$VTHash | awk -F 'positives\":' '{printf "\nDetected Malicious by: " $2}' | awk -F ' ' '{print $1$2$3$6$7}' | sed 's|["}]||g' 
-	printf "${bold}${GRN}--------------------------------\n${NC}${normal}"
-	read -n 1 -s -r -p "Press any key to generate full VirusTotal Report..."
-	printf "\n"
-	printf "${GRN}${bold}Full VirusTotal Report:\n${normal}${NC}"
-	curl -A "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0" -s -X POST 'https://www.virustotal.com/vtapi/v2/file/report' --form apikey=$VTAPIToken --form resource=$VTHash | sed 's|\},|\}\n|g' | column -t -s "," | sed 's/detected//g' | sed 's/version//g' | sed 's/"//g' | sed 's/"//g' | sed 's/{//g' | sed 's/://g' | sed 's/true//g' | sed 's/false//g' | sed 's/result//g' | sed 's/}//g' | sed 's/scans//g' | sed 's/null/NoResult/g' | sed 's/update//g' | sed 's/v //g' | sed 's/-- //g' | sed 's/AB //g' | sed 's/- //g' | sed 's/a //g' | sed 's/variant //g' | sed 's/of //g' | sed 's/( //g' | sed 's/eff //g' | sed 's/ )//g' | sed 's/) //g' | sed 's/(high //g' | sed 's/confidence) //g' | sed 's/ confidence)//g' | sed 's/of //g' | sed 's/(ai //g' | sed 's/score= //g' | sed 's/(A //g' | sed 's/(CLOUD //g' | sed 's/(W //g' | sed 's/confidence //g' | sed 's/ Malicious PE/Malicious PE/g' | sed 's/ PE/PE/g' | sed 's/[[:digit:]]\+\.//g' | sed 's/[0-9]//g' | sed 's/- //g' | sed 's/-- //g' | sed 's/ -//g'  | sed 's/v //g' | sed 's/AB //g' | column -t -s " " #| awk -F '{print $1}' #| sed 's/"//g' | sed 's/{//g' | sed 's/ /|/g'| sed 's/://g' | sed 's/detected//g' | sed 's/,//g' | sed 's/version//g' | sed 's/true//g' | sed 's/false//g' | sed 's/}//g' 
+########################################################################
+#this function allows the user to reopen a previously downloaded report#
+########################################################################
+
+reOpen() {
+	clear
+	dirList
+	#read -n 1 -s -r -p "Press any key to open Malware Domains..."
 	#printf "\n"
+	#prompt user & open report
+	read -p "Which feed would you like to open?" option
 	printf "\n"
+
+	while [[ $option >=1 ]] || [[ $option <=7 ]]; do
+
+		if [[ $option == "1" ]]
+		then
+			xdg-open /home/$USER/Desktop/malScraper/PayloadReport.txt
+			userOptions
+		
+		elif [[ $option == "2" ]]
+		then
+			xdg-open /home/$USER/Desktop/malScraper/AMPReport.txt
+			userOptions
+		
+		elif [[ $option == "3" ]]
+		then
+			xdg-open /home/$USER/Desktop/malScraper/C2Report.txt
+			userOptions
+		
+		elif [[ $option == "4" ]]
+		then
+			xdg-open /home/$USER/Desktop/malScraper/HexReport.csv
+			userOptions
+		
+		elif [[ $option == "5" ]]
+		then
+			xdg-open /home/$USER/Desktop/malScraper/HausMalDown.csv
+			userOptions
+		
+		elif [[ $option == "6" ]]
+		then
+			xdg-open /home/$USER/Desktop/malScraper/Phishing/PhishTank.csv
+			userOptions
+		
+		elif [[ $option == "7" ]]
+		then
+			xdg-open /home/$USER/Desktop/malScraper/Top100.txt
+			userOptions
+		elif [[ $option == "home" ]]
+			then
+				main
+				
+		else
+			clear
+			dirList
+			printf "${RED}${bold}Error: ${normal}${NC}Invalid Option.\n"
+			read -p "Which feed would you like to open? " option
+		fi
+	done
 	userOptions
 }
-tutorial() {
-	echo -e "Go away you egg, this menu is unfinished. \U0001F620"
-	sleep .5
-	printf "\n"
-	userOptions
+
+###############################################
+#function responsible for checking for updates#
+#queries GitHub CodeLoad API to verify version#
+###############################################
+
+versionCheck() {
+	wmctrl -r :ACTIVE: -b add,maximized_vert,maximized_horz
+	versionNum=$(curl -s $release | grep -oP '"tag_name": "\K(.*)(?=")')
+	latestZIPBall=$(curl -s $release | grep -oP '"zipball_url": "\K(.*)(?=")')
+	#echo $versionNum
+	#echo $currentVersion
+	if [[ $currentVersion == $versionNum ]]
+	then
+		printf "${GRN}${bold}Running latest version: 1.2${normal}${NC}"
+		sleep 1
+	else
+		read -p "New version available, update? " option
+		option=${option^^} #force user input to uppercase
+		if [[ $option == YES ]] || [[ $option == Y ]]
+			then
+				#cd /home/$USER/Desktop/malScraper/Updates
+				wget -P /home/$USER/Desktop/malScraper/Updates $latestZIPBall
+				sleep 1
+				clear
+				printf "${GRN}${bold}Success:${normal}${NC} Update downloaded - Install the update via the menu..."
+				sleep 2
+				clear
+		elif [[ $option == NO ]] || [[ $option == N ]]
+			then
+				printf "Continuing..."
+				sleep 1
+		else 
+			printf "${RED}${bold}Error: ${normal}${NC}Invalid Option.\n"
+			read -p "New version available, update? " option
+		fi
+	fi
 }
+
+###########################################################
+#function responsible for printing the main menu to screen#
+###########################################################
 
 main() {
+	versionCheck
 	clear
 	#force maximum window
 	wmctrl -r :ACTIVE: -b add,maximized_vert,maximized_horz
@@ -412,10 +521,9 @@ main() {
 	printf "\tAuthor\t :: Ryan Monaghan\n"
 	printf "\tTwitter\t :: @rynmonaghan\n"
 	printf "\tGithub\t :: https://github.com/Ryan-Monaghan/malScraper\n"
-	printf "\tBranch\t :: Experimental\n"
-	printf "\tVersion\t :: 1.0\n\n${NC}"
+	printf "\tBranch\t :: Stable\n"
+	printf "\tVersion\t :: 1.2\n\n${NC}"
 	
-
 	helpText
 	userOptions
 }
