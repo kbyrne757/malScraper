@@ -116,7 +116,7 @@ def fullScan():
     dirList()
 
 
-def userOptions():
+#def userOptions():
     
 
 
