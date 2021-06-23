@@ -1,19 +1,21 @@
 #python v 3.9.5
 import os
 import getpass
-import urllib.request
 from time import sleep
 import subprocess as sp
 import requests
+import zipfile
 
 #Requires requests package in order to work correctly
 #python -m pip install requests
+
+
 
 def getUser():
     username = getpass.getuser()
     return username
 
-#username = getUser()
+
 test = "https://python.org/"
 
 
@@ -24,7 +26,8 @@ Top100 = ("C:\\Users\\" + getUser() + "\\Downloads\\Top100Report.txt")
 HexReport = ("C:\\Users\\" + getUser() + "\\Downloads\\HexReport.txt")
 HausMalDown = ("C:\\Users\\" + getUser() + "\\Downloads\\HausMalDown.txt")
 PhishTank = ("C:\\Users\\" + getUser() + "\\Downloads\\PhishTank.txt")
-
+file1 = ("C:\\Users\\" + getUser() + "\\Downloads\\file.zip")
+file2 = ("C:\\Users\\" + getUser() + "\\Downloads\\file2")
 #Feed Locations
 PayloadFeed = "https://urlhaus.abuse.ch/downloads/text/"
 C2Feed = "http://cybercrime-tracker.net/all.php"
@@ -71,13 +74,6 @@ def dirList():
     print("7.  Most Recent 100:   " + Top100 + "\n")
 
         
-    #opensesame = open(HausMalDown,"w")
-    #with urllib.request.urlopen(HausMalDownFeed) as response:
-        
-        #opensesame.write(response.read().decode('utf-8'))
-        #opensesame.close()
-        #print("PayloadReport Complete\n")
-       # print("Last stage....done")
 def fullScan():
     print("RIP Internet\n")
 
@@ -94,11 +90,11 @@ def fullScan():
     print("Stage 2 Complete - HexReport.......\n")
     opensesame.close()
     
-    req = requests.get(HausMalDownFeed)
-    opensesame = open(HausMalDown, 'wb')
-    opensesame.write(req.content)
-    print("Stage 3 Complete - HausMalDown.......\n")
-    opensesame.close()
+    #req = requests.get(HausMalDownFeed)
+    #opensesame = open(HausMalDown, 'wb')
+    #opensesame.write(req.content)
+    #print("Stage 3 Complete - HausMalDown.......\n")
+    #opensesame.close()
     
     req = requests.get(PhishTankFeed)
     opensesame = open(PhishTank, 'wb')
@@ -118,12 +114,16 @@ def fullScan():
 
 #def userOptions():
     
+def zipTest():
+    with zipfile.ZipFile(file1, 'r') as zip_ref:
+        zip_ref.extractall(file2)
+    
+zipTest()
 
+#Question = input("would you like to do a quickscan Y/N  ")
+#if (Question == "Y" ) or (Question == "y") or (Question == "yes"):
+    #quickScan()
 
-Question = input("would you like to do a quickscan Y/N  ")
-if (Question == "Y" ) or (Question == "y") or (Question == "yes"):
-    quickScan()
-
-else:
-    fullScan()
+#else:
+    #fullScan()
     
