@@ -22,7 +22,7 @@ C2Report = ("C:\\Users\\" + getUser() + "\\Downloads\\C2Report.txt")
 Top100 = ("C:\\Users\\" + getUser() + "\\Downloads\\Top100Report.txt")
 HexReport = ("C:\\Users\\" + getUser() + "\\Downloads\\HexReport.txt")
 HausMalDown = ("C:\\Users\\" + getUser() + "\\Downloads\\HausMalDown")
-PhishTank = ("C:\\Users\\" + getUser() + "\\Downloads\\PhishTank.txt")
+PhishTank = ("C:\\Users\\" + getUser() + "\\Downloads\\PhishTank.csv")
 tempFile = ("C:\\Users\\" + getUser() + "\\Downloads\\temp.zip")
 
 #Feed Locations
@@ -111,9 +111,66 @@ def fullScan():
 
     dirList()
 
+def Help():
+    print("help")
 
+
+def helpText():
+    print("HELP MENU     Available Options shown below\n")
+    print("Tutorial: How to use the program   TUTORIAL\n")
+    print("Show this help menu: HELP, GET-HELP, ?, MENU\n")
+    print("Clear Screen: CLEAR, CLEAR-HOST, CLS\n")
+    print("Return to Home Menu:      HOME, BACK\n")
+    print("Open an existing report:    OPEN, REOPEN\n")
+    print("Quit the program:            QUIT,EXIT\n")
+    print("Perform Full Scan Note this may take ages: FULL, FULL-SCAN, FSCAN\n")
+    print("Perform Quick-Scan (Most Recent 100 payload Domains):  QUICK, QUICK-SCAN, QSCAN\n")
+    
+
+def tutorial():
+    print("tutorial")
+
+def main():
+    print("main")
+
+def reOpen():
+    print("reopen")
+    
 def userOptions():
-    print("some options")
+    options = input()
+    options = options.upper()
+    print (options)
+
+    if (options == "FULL") or (options == "FULL-SCAN") or (options == "FSCAN"):
+        fullScan()
+
+    elif (options == "QUICK") or (options == "QUICK-SCAN") or (options == "QSCAN"):
+        quickScan()
+
+    elif (options == "QUIT") or (options == "EXIT"):
+        Exit()
+
+    elif (options == "CLEAR") or (options == "CLEAR-HOST") or (options == "CLS"):
+        clearScreen()
+
+    elif (options == "HELP") or (options == "GET-HELP") or (options == "?") or (options == "MENU"):
+        Help()
+
+    elif (options == "BACK") or (options == "HOME"):
+        main()
+
+    elif (options == "TUTORIAL"):
+        tutorial()
+
+    elif (options == "REOPEN") or (options == "OPEN"):
+        reOpen()
+
+    else:
+        clearScreen()
+        print("Invalid Input")
+        helpText()
+        userOptions()
+
 
 #function responsible for checking if requests module is installed before importing
 def setupHost():
@@ -124,6 +181,7 @@ def setupHost():
         print("Attempting install of " + package_name)
         sp.check_call([sys.executable, "-m", "pip", "install", package_name])
         import requests
+        print("Import Succesful")
     else:
         import requests
         print("Import successful")
@@ -143,7 +201,8 @@ def Exit():
         
 print("Passing through SetupHost first to check for modules......")
 setupHost()
-
+helpText()
+userOptions()
 
 Question = input("would you like to do a quickscan Y/N  ")
 Question = Question.upper()
