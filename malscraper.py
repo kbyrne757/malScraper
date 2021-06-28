@@ -3,8 +3,11 @@ import os
 import getpass
 from time import sleep
 import subprocess as sp
-import requests
+import importlib.util
+import sys
 import zipfile
+
+
 
 #Requires requests package in order to work correctly
 #python -m pip install requests
@@ -120,6 +123,18 @@ def fullScan():
 def userOptions():
     print("some options")
 
+def setupHost():
+    package_name = "requests"
+    spec = importlib.util.find_spec(package_name)
+    if spec is None:
+        print(package_name + " is not installed")
+        sp.check_call([sys.executable, "-m", "pip", "install", package_name])
+        import requests
+    else:
+        import requests
+        
+
+    
     
 def Exit():
     Question = input("Are you sure you want to exit?")
@@ -129,7 +144,9 @@ def Exit():
     else:
         userOptions()
         
-    
+        
+print("Passing through SetupHost first to check for modules......")
+setupHost()
 
 
 Question = input("would you like to do a quickscan Y/N  ")
@@ -138,7 +155,7 @@ if (Question == "Y" ) or (Question == "YES"):
     quickScan()
 
 elif (Question == "EXIT"):
-      Exit()
+    Exit()
 
 else:
     fullScan()
