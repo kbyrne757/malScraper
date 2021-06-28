@@ -24,10 +24,12 @@ AMPReport = ("C:\\Users\\" + getUser() + "\\Downloads\\AMPReport.txt")
 C2Report = ("C:\\Users\\" + getUser() + "\\Downloads\\C2Report.txt")
 Top100 = ("C:\\Users\\" + getUser() + "\\Downloads\\Top100Report.txt")
 HexReport = ("C:\\Users\\" + getUser() + "\\Downloads\\HexReport.txt")
-HausMalDown = ("C:\\Users\\" + getUser() + "\\Downloads\\HausMalDown.txt")
+HausMalDown = ("C:\\Users\\" + getUser() + "\\Downloads\\HausMalDown")
 PhishTank = ("C:\\Users\\" + getUser() + "\\Downloads\\PhishTank.txt")
-file1 = ("C:\\Users\\" + getUser() + "\\Downloads\\file.zip")
-file2 = ("C:\\Users\\" + getUser() + "\\Downloads\\file2")
+tempFile = ("C:\\Users\\" + getUser() + "\\Downloads\\temp.zip")
+
+
+
 #Feed Locations
 PayloadFeed = "https://urlhaus.abuse.ch/downloads/text/"
 C2Feed = "http://cybercrime-tracker.net/all.php"
@@ -90,11 +92,14 @@ def fullScan():
     print("Stage 2 Complete - HexReport.......\n")
     opensesame.close()
     
-    #req = requests.get(HausMalDownFeed)
-    #opensesame = open(HausMalDown, 'wb')
-    #opensesame.write(req.content)
-    #print("Stage 3 Complete - HausMalDown.......\n")
-    #opensesame.close()
+    req = requests.get(HausMalDownFeed)
+    opensesame = open(tempFile, 'wb')
+    opensesame.write(req.content)
+    with zipfile.ZipFile(tempFile, 'r') as zip_ref:
+        zip_ref.extractall(HausMalDown)
+    opensesame.close()
+    print("Stage 3 Complete - HausMaldown.......\n")
+    os.remove(tempFile)
     
     req = requests.get(PhishTankFeed)
     opensesame = open(PhishTank, 'wb')
@@ -114,16 +119,11 @@ def fullScan():
 
 #def userOptions():
     
-def zipTest():
-    with zipfile.ZipFile(file1, 'r') as zip_ref:
-        zip_ref.extractall(file2)
-    
-zipTest()
 
-#Question = input("would you like to do a quickscan Y/N  ")
-#if (Question == "Y" ) or (Question == "y") or (Question == "yes"):
-    #quickScan()
+Question = input("would you like to do a quickscan Y/N  ")
+if (Question == "Y" ) or (Question == "y") or (Question == "yes"):
+    quickScan()
 
-#else:
-    #fullScan()
+else:
+    fullScan()
     
