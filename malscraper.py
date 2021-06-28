@@ -13,6 +13,23 @@ def getUser():
     username = getpass.getuser()
     return username
 
+#function responsible for checking if requests module is installed before importing
+def setupHost():
+    package_name = "requests"
+    spec = importlib.util.find_spec(package_name)
+    if spec is None:
+        print(package_name + " is not installed")
+        print("Attempting install of " + package_name)
+        sp.check_call([sys.executable, "-m", "pip", "install", package_name])
+        sleep(2)
+        import requests
+        print("Import Succesful")
+    else:
+        import requests
+        print("Import successful")
+
+
+
 test = "https://python.org/"
 
 #Default Directory locations for reports
@@ -106,7 +123,7 @@ def fullScan():
     req = requests.get(test)
     opensesame.write(req.content)
     print("Stage 5 Complete - PayloadReport........")
-    sleep(5)
+    sleep(2)
     opensesame.close()
 
     dirList()
@@ -116,15 +133,16 @@ def Help():
 
 
 def helpText():
-    print("HELP MENU     Available Options shown below\n")
-    print("Tutorial: How to use the program   TUTORIAL\n")
-    print("Show this help menu: HELP, GET-HELP, ?, MENU\n")
-    print("Clear Screen: CLEAR, CLEAR-HOST, CLS\n")
-    print("Return to Home Menu:      HOME, BACK\n")
-    print("Open an existing report:    OPEN, REOPEN\n")
-    print("Quit the program:            QUIT,EXIT\n")
-    print("Perform Full Scan Note this may take ages: FULL, FULL-SCAN, FSCAN\n")
-    print("Perform Quick-Scan (Most Recent 100 payload Domains):  QUICK, QUICK-SCAN, QSCAN\n")
+    print("\nHELP MENU     Available Options shown below\n")
+    print("OPTION 1: Tutorial: How to use the program\n")
+    print("OPTION 2: Help Menu \n")
+    print("OPTION 3: Clear Screen\n")
+    print("OPTION 4: Home Menu  \n")
+    print("OPTION 5: Open an existing report\n")
+    print("OPTION 6: Perform Full Scan Note this may take an extended period of time\n")
+    print("OPTION 7: Perform Quick-Scan (Most Recent 100 payload Domains)\n")
+    print("OPTION 0: Quit the program\n")
+    userOptions(input())
     
 
 def tutorial():
@@ -136,56 +154,37 @@ def main():
 def reOpen():
     print("reopen")
     
-def userOptions():
-    options = input()
-    options = options.upper()
-    print (options)
+def userOptions(options):
 
-    if (options == "FULL") or (options == "FULL-SCAN") or (options == "FSCAN"):
-        fullScan()
-
-    elif (options == "QUICK") or (options == "QUICK-SCAN") or (options == "QSCAN"):
-        quickScan()
-
-    elif (options == "QUIT") or (options == "EXIT"):
-        Exit()
-
-    elif (options == "CLEAR") or (options == "CLEAR-HOST") or (options == "CLS"):
-        clearScreen()
-
-    elif (options == "HELP") or (options == "GET-HELP") or (options == "?") or (options == "MENU"):
-        Help()
-
-    elif (options == "BACK") or (options == "HOME"):
-        main()
-
-    elif (options == "TUTORIAL"):
+    if (options == "1"):
         tutorial()
 
-    elif (options == "REOPEN") or (options == "OPEN"):
+    elif (options == "2"):
+        Help()
+    
+    elif (options == "3"):
+        clearScreen()
+
+    elif (options == "4"):
+        main()
+
+    elif (options == "5"):
         reOpen()
 
+    elif (options == "6"):
+        fullScan()
+
+    elif (options == "7"):
+        quickScan()
+    
+    elif (options == "0"):
+        Exit()
+        
     else:
         clearScreen()
-        print("Invalid Input")
+        print("InVaLiD iNpUt")
         helpText()
         userOptions()
-
-
-#function responsible for checking if requests module is installed before importing
-def setupHost():
-    package_name = "requests"
-    spec = importlib.util.find_spec(package_name)
-    if spec is None:
-        print(package_name + " is not installed")
-        print("Attempting install of " + package_name)
-        sp.check_call([sys.executable, "-m", "pip", "install", package_name])
-        import requests
-        print("Import Succesful")
-    else:
-        import requests
-        print("Import successful")
-        
 
     
 #function responsible for exiting the program    
@@ -204,14 +203,4 @@ setupHost()
 helpText()
 userOptions()
 
-Question = input("would you like to do a quickscan Y/N  ")
-Question = Question.upper()
-if (Question == "Y" ) or (Question == "YES"):
-    quickScan()
-
-elif (Question == "EXIT"):
-    Exit()
-
-else:
-    fullScan()
     
