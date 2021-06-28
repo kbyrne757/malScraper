@@ -6,22 +6,16 @@ import subprocess as sp
 import importlib.util
 import sys
 import zipfile
+import random
 
-
-
-#Requires requests package in order to work correctly
-#python -m pip install requests
-
-
-
+#function to acquire username for directory listing
 def getUser():
     username = getpass.getuser()
     return username
 
-
 test = "https://python.org/"
 
-
+#Default Directory locations for reports
 PayloadReport = ("C:\\Users\\" + getUser() + "\\Downloads\\PayloadReport.txt")
 AMPReport = ("C:\\Users\\" + getUser() + "\\Downloads\\AMPReport.txt")
 C2Report = ("C:\\Users\\" + getUser() + "\\Downloads\\C2Report.txt")
@@ -31,19 +25,15 @@ HausMalDown = ("C:\\Users\\" + getUser() + "\\Downloads\\HausMalDown")
 PhishTank = ("C:\\Users\\" + getUser() + "\\Downloads\\PhishTank.txt")
 tempFile = ("C:\\Users\\" + getUser() + "\\Downloads\\temp.zip")
 
-
-
 #Feed Locations
 PayloadFeed = "https://urlhaus.abuse.ch/downloads/text/"
 C2Feed = "http://cybercrime-tracker.net/all.php"
 HexFeed = "http://tracker.h3x.eu/api/sites_1month.php"
 PhishTankFeed = "http://data.phishtank.com/data/online-valid.csv"
 HausMalDownFeed = "https://urlhaus.abuse.ch/downloads/csv/"
-#print("testing screenclear")
 
-
+#function for scan of one feed
 def quickScan():
-    ## -> this only seems to work in cmd os.system('cls')
     opensesame = open(PayloadReport,"wb")
     req = requests.get(test)
     opensesame.write(req.content)
@@ -65,9 +55,11 @@ def quickScan():
         fileName = Top100
         sp.Popen([programName, fileName])
 
+#function for clearing screen
+def clearScreen():
+    os.system('cls')
 
-
-
+#function for listing the directories
 def dirList():
     print("Success - Files written to: \n")
     print("1.  Payload Domains:   " + PayloadReport + "\n") 
@@ -78,7 +70,7 @@ def dirList():
     print("6.  PhishTank Phishing Pages:   " + PhishTank + "\n")
     print("7.  Most Recent 100:   " + Top100 + "\n")
 
-        
+#function for full scan, pulls down from all feeds       
 def fullScan():
     print("RIP Internet\n")
 
@@ -123,23 +115,27 @@ def fullScan():
 def userOptions():
     print("some options")
 
+#function responsible for checking if requests module is installed before importing
 def setupHost():
     package_name = "requests"
     spec = importlib.util.find_spec(package_name)
     if spec is None:
         print(package_name + " is not installed")
+        print("Attempting install of " + package_name)
         sp.check_call([sys.executable, "-m", "pip", "install", package_name])
         import requests
     else:
         import requests
+        print("Import successful")
         
 
     
-    
+#function responsible for exiting the program    
 def Exit():
     Question = input("Are you sure you want to exit?")
     Question = Question.upper()
     if (Question == "Y" ) or (Question == "YES"):
+        clearScreen()
         quit()
     else:
         userOptions()
