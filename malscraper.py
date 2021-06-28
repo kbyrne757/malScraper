@@ -117,12 +117,28 @@ def fullScan():
     dirList()
 
 
-#def userOptions():
+def userOptions():
+    print("some options")
+
+    
+def Exit():
+    Question = input("Are you sure you want to exit?")
+    Question = Question.upper()
+    if (Question == "Y" ) or (Question == "YES"):
+        quit()
+    else:
+        userOptions()
+        
     
 
+
 Question = input("would you like to do a quickscan Y/N  ")
-if (Question == "Y" ) or (Question == "y") or (Question == "yes"):
+Question = Question.upper()
+if (Question == "Y" ) or (Question == "YES"):
     quickScan()
+
+elif (Question == "EXIT"):
+      Exit()
 
 else:
     fullScan()
