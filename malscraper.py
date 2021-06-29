@@ -53,6 +53,9 @@ def setupHost():
         print("Import successful")
 
 
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36'
+}
 
 test = "https://python.org/"
 
@@ -77,7 +80,7 @@ HausMalDownFeed = "https://urlhaus.abuse.ch/downloads/csv/"
 #function for scan of one feed
 def quickScan():
     opensesame = open(PayloadReport,"wb")
-    req = requests.get(test)
+    req = requests.get(test,headers=headers)
     opensesame.write(req.content)
     print("Writing to file .....")
     sleep(5)
@@ -122,19 +125,19 @@ def fullScan():
     print("RIP Internet\n")
 
 
-    req = requests.get(C2Feed)
+    req = requests.get(C2Feed, headers=headers)
     opensesame = open(C2Report, 'wb')
     opensesame.write(req.content)
     print("Stage 1 Complete - C2Report.......\n")
     opensesame.close()
 
-    req = requests.get(HexFeed)
+    req = requests.get(HexFeed, headers=headers)
     opensesame = open(HexReport, 'wb')
     opensesame.write(req.content)
     print("Stage 2 Complete - HexReport.......\n")
     opensesame.close()
     
-    req = requests.get(HausMalDownFeed)
+    req = requests.get(HausMalDownFeed, headers=headers)
     opensesame = open(tempFile, 'wb')
     opensesame.write(req.content)
     with zipfile.ZipFile(tempFile, 'r') as zip_ref:
@@ -145,14 +148,14 @@ def fullScan():
     os.rename(meme, HausMalDown)
     print("Stage 3 Complete - HausMaldown.......\n")
     
-    req = requests.get(PhishTankFeed)
+    req = requests.get(PhishTankFeed, headers=headers)
     opensesame = open(PhishTank, 'wb')
     opensesame.write(req.content)
     print("Stage 4 Complete - PhishTank.......\n")
     opensesame.close()
 
     opensesame = open(PayloadReport,"wb")
-    req = requests.get(test)
+    req = requests.get(test, headers=headers)
     opensesame.write(req.content)
     print("Stage 5 Complete - PayloadReport........\n")
     sleep(2)
@@ -360,4 +363,3 @@ def Exit():
         
         
 main()
-    
