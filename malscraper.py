@@ -7,7 +7,6 @@ import importlib.util
 import sys
 import zipfile
 import random
-from art import *
 try:
     import requests
 except ModuleNotFoundError:
@@ -19,6 +18,16 @@ except ModuleNotFoundError:
     import requests
     print("Import Succesful")
 
+try:
+    from art import *
+except ModuleNotFoundError:
+    package_name = "art"
+    print(package_name + " is not installed")
+    print("Attempting install of " + package_name)
+    sp.check_call([sys.executable, "-m", "pip", "install", package_name])
+    sleep(0.5)
+    from art import *
+    print("Import Succesful")
 
 
 
