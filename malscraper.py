@@ -7,6 +7,21 @@ import importlib.util
 import sys
 import zipfile
 import random
+from art import *
+try:
+    import requests
+except ModuleNotFoundError:
+    package_name = "requests"
+    print(package_name + " is not installed")
+    print("Attempting install of " + package_name)
+    sp.check_call([sys.executable, "-m", "pip", "install", package_name])
+    sleep(0.5)
+    import requests
+    print("Import Succesful")
+
+
+
+
 
 #function to acquire username for directory listing
 def getUser():
@@ -38,9 +53,10 @@ AMPReport = ("C:\\Users\\" + getUser() + "\\Downloads\\AMPReport.txt")
 C2Report = ("C:\\Users\\" + getUser() + "\\Downloads\\C2Report.txt")
 Top100 = ("C:\\Users\\" + getUser() + "\\Downloads\\Top100Report.txt")
 HexReport = ("C:\\Users\\" + getUser() + "\\Downloads\\HexReport.txt")
-HausMalDown = ("C:\\Users\\" + getUser() + "\\Downloads\\HausMalDown")
+HausMalDown = ("C:\\Users\\" + getUser() + "\\Downloads\\HausMalDown.csv")
 PhishTank = ("C:\\Users\\" + getUser() + "\\Downloads\\PhishTank.csv")
 tempFile = ("C:\\Users\\" + getUser() + "\\Downloads\\temp.zip")
+download = ("C:\\Users\\" + getUser() + "\\Downloads")
 
 #Feed Locations
 PayloadFeed = "https://urlhaus.abuse.ch/downloads/text/"
@@ -76,6 +92,11 @@ def quickScan():
 def clearScreen():
     os.system('cls')
 
+
+def clearMenu():
+    clearScreen()
+    main()
+
 #function for listing the directories
 def dirList():
     print("Success - Files written to: \n")
@@ -108,10 +129,12 @@ def fullScan():
     opensesame = open(tempFile, 'wb')
     opensesame.write(req.content)
     with zipfile.ZipFile(tempFile, 'r') as zip_ref:
-        zip_ref.extractall(HausMalDown)
+        zip_ref.extractall(download)
     opensesame.close()
-    print("Stage 3 Complete - HausMaldown.......\n")
     os.remove(tempFile)
+    meme ="C:\\Users\\" + getUser() + "\\Downloads\\csv.txt"
+    os.rename(meme, HausMalDown)
+    print("Stage 3 Complete - HausMaldown.......\n")
     
     req = requests.get(PhishTankFeed)
     opensesame = open(PhishTank, 'wb')
@@ -122,11 +145,78 @@ def fullScan():
     opensesame = open(PayloadReport,"wb")
     req = requests.get(test)
     opensesame.write(req.content)
-    print("Stage 5 Complete - PayloadReport........")
+    print("Stage 5 Complete - PayloadReport........\n")
     sleep(2)
     opensesame.close()
 
+    x = 99
+    with open(PayloadReport,'r') as r1:
+        data = r1.readlines()
+    with open(Top100,'w') as f2:
+        for line in data[:x]:
+            f2.write(line)
+    print("Stage 6 Complete - Top100.........\n")
+    r1.close()
+    f2.close()
+    
     dirList()
+
+    userOptions = input("Would you like to open a report? ")
+    userOptions = userOptions.upper()
+    if (userOptions == "YES") or (userOptions == "Y"):
+        fileOpen == input("Select Number: ")
+        if (fileOpen == "1"):
+             programName = "notepad.exe"
+             fileName = PayloadReport
+             sp.Popen([programName, fileName])
+             main()
+
+        elif (fileOpen == "2"):
+            programName = "notepad.exe"
+            fileName = PayloadReport
+            sp.Popen([programName, fileName])
+            main()
+    
+        elif (fileOpen == "3"):
+            programName = "notepad.exe"
+            fileName = C2Report
+            sp.Popen([programName, fileName])
+            main()
+
+        elif (fileOpen == "4"):
+            programName = "notepad.exe"
+            fileName = HexReport
+            sp.Popen([programName, fileName])
+            main()
+
+        elif (fileOpen == "5"):
+            programName = "notepad.exe"
+            fileName = HausMalDown
+            sp.Popen([programName, fileName])
+            main()
+
+        elif (fileOpen == "6"):
+            programName = "notepad.exe"
+            fileName = PhishTank
+            sp.Popen([programName, fileName])
+            main()
+
+        elif (fileOpen == "7"):
+            programName = "notepad.exe"
+            fileName = Top100
+            sp.Popen([programName, fileName])
+            main()
+    
+        elif (fileOpen == "0"):
+            main()
+        
+        else:
+            clearScreen()
+            print("InVaLiD iNpUt")
+            helpText()
+    else:
+        main()
+    
 
 def Help():
     print("help")
@@ -134,7 +224,7 @@ def Help():
 
 def helpText():
     print("\nHELP MENU     Available Options shown below\n")
-    print("OPTION 1: Tutorial: How to use the program\n")
+    print("OPTION 1: Tutorial\n")
     print("OPTION 2: Help Menu \n")
     print("OPTION 3: Clear Screen\n")
     print("OPTION 4: Home Menu  \n")
@@ -149,10 +239,72 @@ def tutorial():
     print("tutorial")
 
 def main():
-    print("main")
+    tprint("MalScraper",font="block",chr_ignore=True)
+    helpText()
+
 
 def reOpen():
-    print("reopen")
+    print("Which file would you like to open? \n")
+    print("1.  Payload Domains:   " + PayloadReport + "\n") 
+    print("2.  AMP Report:   " + AMPReport + "\n")
+    print("3.  C2 Servers:   " + C2Report + "\n")
+    print("4.  Hex Report:   " + HexReport + "\n")
+    print("5.  URLHaus Maldownloads:     " + HausMalDown + "\n")
+    print("6.  PhishTank Phishing Pages:   " + PhishTank + "\n")
+    print("7.  Most Recent 100:   " + Top100 + "\n")
+    fileOpen = input()
+
+    if (fileOpen == "1"):
+         programName = "notepad.exe"
+         fileName = PayloadReport
+         sp.Popen([programName, fileName])
+         main()
+
+    elif (fileOpen == "2"):
+        programName = "notepad.exe"
+        fileName = PayloadReport
+        sp.Popen([programName, fileName])
+        main()
+    
+    elif (fileOpen == "3"):
+        programName = "notepad.exe"
+        fileName = C2Report
+        sp.Popen([programName, fileName])
+        main()
+
+    elif (fileOpen == "4"):
+        programName = "notepad.exe"
+        fileName = HexReport
+        sp.Popen([programName, fileName])
+        main()
+
+    elif (fileOpen == "5"):
+        programName = "notepad.exe"
+        fileName = HausMalDown
+        sp.Popen([programName, fileName])
+        main()
+
+    elif (fileOpen == "6"):
+        programName = "notepad.exe"
+        fileName = PhishTank
+        sp.Popen([programName, fileName])
+        main()
+
+    elif (fileOpen == "7"):
+        programName = "notepad.exe"
+        fileName = Top100
+        sp.Popen([programName, fileName])
+        main()
+    
+    elif (fileOpen == "0"):
+        main()
+        
+    else:
+        clearScreen()
+        print("InVaLiD iNpUt")
+        helpText()
+
+    
     
 def userOptions(options):
 
@@ -163,7 +315,7 @@ def userOptions(options):
         Help()
     
     elif (options == "3"):
-        clearScreen()
+        clearMenu()
 
     elif (options == "4"):
         main()
@@ -189,18 +341,14 @@ def userOptions(options):
     
 #function responsible for exiting the program    
 def Exit():
-    Question = input("Are you sure you want to exit?")
+    Question = input("Are you sure you want to exit? \n")
     Question = Question.upper()
     if (Question == "Y" ) or (Question == "YES"):
         clearScreen()
         quit()
     else:
-        userOptions()
+        helpText()
         
         
-print("Passing through SetupHost first to check for modules......")
-setupHost()
-helpText()
-userOptions()
-
+main()
     
